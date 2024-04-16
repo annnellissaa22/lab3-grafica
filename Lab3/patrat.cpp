@@ -8,19 +8,46 @@ Programul afiseaza un patrat pe care il translateaza pe axa x la apasarea sageti
 #include "glaux.h"
 
 static GLfloat x = 0;
+GLUquadricObj* myQuadric;
+
 
 void myInit() {
     glClearColor(1.0, 1.0, 1.0, 1.0);
+    myQuadric = gluNewQuadric();
+
 }
 
-void CALLBACK MutaStanga()
-{
-    x = x - 10;
+
+void Sfera(){
+    gluQuadricDrawStyle(myQuadric, GLU_LINE);
+    glPushMatrix();
+    glTranslatef(-150, 0, 0);
+    glRotatef(90, 1, 0, 0);
+    glRotatef(45, 1, 1, 1);
+    glColor3f(1.0, 1.0, 0);
+    gluSphere(myQuadric, 30, 50, 50);
+    glPopMatrix();
 }
 
-void CALLBACK MutaDreapta()
-{
-    x = x + 10;
+void Cilindru() {
+    glPushMatrix();
+    glTranslatef(-100, 0, 0);
+    glRotatef(90, 1, 0, 0);
+    glRotatef(60, 1, 1, 1);
+    glColor3f(0.0, 1.0, 0);
+    gluCylinder(myQuadric, 20, 20, 40, 30, 20);
+    glPopMatrix();
+}
+
+void Cub() {
+    gluQuadricDrawStyle(myQuadric, GLU_SILHOUETTE);
+    glPushMatrix();
+    glTranslatef(30, 0, 0);
+    glRotatef(105, 1, 0, 0);
+    glRotatef(90, 1, 1, 1);
+    glColor3f(0, 1.0, 1.0);
+    gluCylinder(myQuadric, 20, 20, 20, 4, 10);
+    glPopMatrix();
 }
 
 void CALLBACK display()
@@ -29,20 +56,11 @@ void CALLBACK display()
 
     glLoadIdentity();
 
-    glTranslatef(x, 0, 0.0);
-
-    glBegin(GL_QUADS);
-    {
-        glColor3f(1.0, 0.0, 0.0);
-        glVertex2f(100, 100);
-        glColor3f(1.0, 1.0, 0.0);
-        glVertex2f(150.0, 100.0);
-        glColor3f(0.0, 0.0, 1.0);
-        glVertex2f(150.0, 150.0);
-        glColor3f(0.0, 1.0, 0.0);
-        glVertex2f(100.0, 150.0);
-    }
-    glEnd();
+    Cilindru();
+    Sfera();
+    Cub();
+    
+    glPopMatrix();
 
     glFlush();
 }
@@ -58,10 +76,10 @@ void CALLBACK myReshape(GLsizei w, GLsizei h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     if (w <= h) {
-        glOrtho(-160.0, 160.0, 160.0 * (GLfloat)h / (GLfloat)w, -160.0 * (GLfloat)h / (GLfloat)w, -10.0, 10.0);
+        glOrtho(-160.0, 160.0, 160.0 * (GLfloat)h / (GLfloat)w, -160.0 * (GLfloat)h / (GLfloat)w, -200.0, 200.0);
     }
     else {
-        glOrtho(-160.0 * (GLfloat)w / (GLfloat)h, 160.0 * (GLfloat)w / (GLfloat)h, -160.0, 160.0, -10.0, 10.0);
+        glOrtho(-160.0 * (GLfloat)w / (GLfloat)h, 160.0 * (GLfloat)w / (GLfloat)h, -160.0, 160.0, -200.0, 200.0);
     }
     glMatrixMode(GL_MODELVIEW);
 }
@@ -81,11 +99,9 @@ int main(int argc, char** argv)
 {
     auxInitDisplayMode(AUX_SINGLE | AUX_RGB);
     auxInitPosition(0, 0, 800, 600);
-    auxInitWindow("Un patrat");
+    auxInitWindow("Lab. 3");
     myInit();
-    auxKeyFunc(AUX_LEFT, MutaStanga);
-    auxKeyFunc(AUX_RIGHT, MutaDreapta);
-
+    
     auxReshapeFunc(myReshape);
     auxMainLoop(display);
     return(0);
